@@ -8,28 +8,43 @@ on:
         required: true
       source_workflow_name:
         description: "Name of the workflow that created the artifact"
-        required: true
+        required: false
       source_workflow_run_id:
         description: "Run ID of the workflow that created the artifact"
-        required: true
+        required: false
       artifact_name:
         description: "Name of the artifact to download"
         required: true
-
+env:
+  REPO: ${{ github.event.inputs.source_repository }}
+  WORKFLOW_NAME: ${{ github.event.inputs.source_workflow_name }}
 jobs:
   download_and_display:
     runs-on: ubuntu-latest
     steps:
+
+    - name: Grab Worklflow ID
+      id: get_workflow_id
+      run: |
+        WORKFLOW_ID=$(gh workflow list --repo "$REPO" --json id,name | jq -r '.[] | select(.name == "'"$WORKFLOW_NAME"'") | .id')
+
+    - name: Get Workflow Run ID
+      id: get_workflow_run_id
+      run: |
+        WORKFLOW_RUN_ID=$(gh run list -w 100153781 --repo jsandov/skeletonArtifactProducer -L 1 --json databaseId | jq '.[]| .databaseId')
+
     - name: Download Artifact
       uses: actions/download-artifact@v4
       with:
         name: ${{ github.event.inputs.artifact_name }}
         github-token: ${{ secrets.GH_PAT }} # Replace with your secret
         repository: ${{ github.event.inputs.source_repository }}
-        run-id: ${{ github.event.inputs.source_workflow_run_id }}
+        run-id: $WORKFLOW_RUN_ID
 
     - name: Display Artifact Contents
       run: ls -R .
 
     - name: Display specific file in artifact
-      run: cat ${{ github.event.inputs.artifact_name }}
+      run: cat hello.txt
+
+
