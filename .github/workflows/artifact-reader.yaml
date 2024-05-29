@@ -28,8 +28,8 @@ jobs:
         repository: ${{ github.event.inputs.source_repository }}
         run-id: ${{ github.event.inputs.source_workflow_run_id }}
 
-    # - name: Display Artifact Contents
-    #   run: ls -R ${{ github.event.inputs.artifact_name }}
+    - name: Display Artifact Contents
+      run: ls -R .
 
     - name: Display specific file in artifact
-      run: cat ${{ github.event.inputs.artifact_name }}/filename
+      run: cat ${{ github.event.inputs.artifact_name }}
