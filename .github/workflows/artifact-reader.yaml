@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Grab Worklflow ID
+    - name: Grab Worklflow_id
       id: get_workflow_id
       run: |
         WORKFLOW_ID=$(gh workflow list --repo "$REPO" --json id,name | jq -r '.[] | select(.name == "'"$WORKFLOW_NAME"'") | .id')
