@@ -3,30 +3,24 @@ name: Build and Archive Artifact
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:  # Manual trigger added here
+    - main
+  workflow_dispatch: # Manual trigger added here
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Set up Python (Replace with your language and version if needed)
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
+    - name: Build Skeleton Artifact
+      run: |
+        mkdir -p artifact
+        echo "Hello, World!" > artifact/hello.txt
 
-      - name: Install Dependencies (Replace with your project's command)
-        run: pip install -r requirements.txt
-
-      - name: Build Project (Replace with your project's build command)
-        run: python setup.py sdist bdist_wheel
-
-      - name: Archive Artifact (Replace 'dist' with your build output directory)
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-artifact
-          path: artifact
+    - name: Archive Artifact (Replace 'dist' with your build output directory)
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: artifact
