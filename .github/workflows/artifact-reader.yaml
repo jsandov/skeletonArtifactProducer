@@ -34,6 +34,7 @@ jobs:
       id: get_workflow_run_id
       run: |
         WORKFLOW_RUN_ID=$(gh run list -w 100153781 --repo jsandov/skeletonArtifactProducer -L 1 --json databaseId | jq '.[]| .databaseId')
+        echo "The workflow id is: ${WORKFLOW_RUN_ID}"
         echo "WORKFLOW_RUN_ID=$WORKFLOW_RUN_ID" >> $GITHUB_OUTPUT
 
     - name: Download Artifact
