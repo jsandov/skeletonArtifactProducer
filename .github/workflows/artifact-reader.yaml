@@ -42,7 +42,7 @@ jobs:
         name: ${{ github.event.inputs.artifact_name }}
         github-token: ${{ secrets.GH_PAT }} # Replace with your secret
         repository: ${{ github.event.inputs.source_repository }}
-        run-id: ${{ steps.get_workflow_run_id.outputs.WORKFLOW_RUN_ID }}
+        run-id: ${{ steps.vars.get_workflow_run_id.outputs.WORKFLOW_RUN_ID }}
 
     - name: Display Artifact Contents
       run: ls -R .
