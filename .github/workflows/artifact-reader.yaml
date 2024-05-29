@@ -27,15 +27,15 @@ jobs:
       id: get_workflow_id
       run: |
         WORKFLOW_ID=$(gh workflow list --repo "$REPO" --json id,name | jq -r '.[] | select(.name == "'"$WORKFLOW_NAME"'") | .id')
-        echo "WORKFLOW_ID=$WORKFLOW_ID" >> $GITHUB_OUTPUT
+        echo "workflow_id=$WORKFLOW_ID" >> $GITHUB_OUTPUT
 
 
     - name: Get Workflow Run ID
       id: get_workflow_run_id
       run: |
-        WORKFLOW_RUN_ID=$(gh run list -w 100153781 --repo jsandov/skeletonArtifactProducer -L 1 --json databaseId | jq '.[]| .databaseId')
+        WORKFLOW_RUN_ID=$(gh run list -w 100153781 --repo jsandov/skeletonArtifactProducer -L 1 --json databaseId | jq '.[] | .databaseId')
         echo "The workflow id is: ${WORKFLOW_RUN_ID}"
-        echo "WORKFLOW_RUN_ID=$WORKFLOW_RUN_ID" >> $GITHUB_OUTPUT
+        echo "workflow_run_id=$WORKFLOW_RUN_ID" >> $GITHUB_OUTPUT
 
     - name: Download Artifact
       uses: actions/download-artifact@v4
@@ -43,7 +43,9 @@ jobs:
         name: ${{ github.event.inputs.artifact_name }}
         github-token: ${{ secrets.GH_PAT }} # Replace with your secret
         repository: ${{ github.event.inputs.source_repository }}
-        run-id: ${{ steps.vars.get_workflow_run_id.outputs.WORKFLOW_RUN_ID }}
+        run-id: ${{ steps.vars.get_workflow_run_id.outputs.workflow_run_id }}
+
+
 
     - name: Display Artifact Contents
       run: ls -R .
