@@ -29,7 +29,8 @@ jobs:
         echo "workflow_id=$WORKFLOW_ID" >> $GITHUB_OUTPUT
 
     - name: Debug Workflow ID
-      run: echo "Workflow ID: ${{ steps.get_workflow_id.outputs.workflow_id }}"
+      run: |
+        echo "Workflow ID: ${{ steps.get_workflow_id.outputs.workflow_id }}"
 
     - name: Get Workflow Run ID
       id: get_workflow_run_id
@@ -38,7 +39,8 @@ jobs:
         echo "workflow_run_id=$WORKFLOW_RUN_ID" >> $GITHUB_OUTPUT
 
     - name: Debug Workflow Run ID
-      run: echo "Workflow Run ID: ${{ steps.get_workflow_run_id.outputs.workflow_run_id }}"
+      run: |
+        echo "Workflow Run ID: ${{ steps.get_workflow_run_id.outputs.workflow_run_id }}"
 
     - name: Download Artifact
       uses: actions/download-artifact@v4
