@@ -41,12 +41,24 @@ jobs:
       - Grab_Workflow_Run_ID
     runs-on: ubuntu-latest
     steps:
-    - name: Download Artifact
-      uses: actions/download-artifact@v4.0.0
-      with:
-        name: ${{ github.event.inputs.artifact_name }}
-        repository: ${{ env.REPO }}
-        run-id: ${{ needs.Grab_Workflow_Run_ID.outputs.workflow_run_id}}
+    # - name: Download Artifact
+    #   uses: actions/download-artifact@v4.0.0
+    #   with:
+    #     name: ${{ github.event.inputs.artifact_name }}
+    #     repository: ${{ env.REPO }}
+    #     run-id: ${{ needs.Grab_Workflow_Run_ID.outputs.workflow_run_id}}
+
+    - name: Download Artifact using API
+      id: download_artifact
+      run: |
+        ARTIFACT_URL=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" \
+          "https://api.github.com/repos/${{ env.REPO }}/actions/runs/${{ needs.Grab_Workflow_Run_ID.outputs.workflow_run_id }}/artifacts" \
+          | jq -r '.artifacts[] | select(.name == "'${{ github.event.inputs.artifact_name }}'") | .archive_download_url')
+        
+        echo "Artifact URL: $ARTIFACT_URL"
+        
+        curl -L -o artifact.zip -H "Authorization: token ${{ secrets.GH_PAT }}" $ARTIFACT_URL
+        unzip artifact.zip -d artifact
 
     - name: Display Artifact Contents
       run: ls -R .
