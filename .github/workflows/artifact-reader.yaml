@@ -18,6 +18,7 @@ on:
 env:
   REPO: ${{ github.event.inputs.source_repository }}
   WORKFLOW_NAME: ${{ github.event.inputs.source_workflow_name }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   Grab_Workflow_Run_ID:
     runs-on: ubuntu-latest
