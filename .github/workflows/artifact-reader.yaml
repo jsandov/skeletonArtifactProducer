@@ -19,35 +19,33 @@ env:
   REPO: ${{ github.event.inputs.source_repository }}
   WORKFLOW_NAME: ${{ github.event.inputs.source_workflow_name }}
 jobs:
-  download_and_display:
+  Grab_Workflow_Run_ID:
     runs-on: ubuntu-latest
     steps:
-    - name: Grab Workflow ID
-      id: get_workflow_id
+
+    - name: Get Workflow and Run ID
+      id: get_ids
       run: |
         WORKFLOW_ID=$(gh workflow list --repo "${{ env.REPO }}" --json id,name | jq -r '.[] | select(.name == "Build and Archive Artifact") | .id')
         echo "workflow_id=$WORKFLOW_ID" >> $GITHUB_ENV
+        WORKFLOW_RUN_ID=$(gh run list -w $WORKFLOW_ID --repo ${{ env.REPO }} -L 1 --json databaseId | jq -r '.[] | .databaseId')
+        echo "workflow_run_id=$WORKFLOW_RUN_ID" >> $GITHUB_OUTPUT
+        echo "This is the workflow ID: $WORKFLOW_ID"
+        echo "This is the workflow run ID: $WORKFLOW_RUN_ID"
+    outputs:
+      workflow_run_id: ${{ steps.get_ids.outputs.workflow_run_id }}
 
-    - name: Debug Workflow ID
-      run: |
-        echo "Workflow ID: ${{ env.workflow_id }}"
-
-    - name: Get Workflow Run ID
-      id: get_workflow_run_id
-      run: |
-        WORKFLOW_RUN_ID=$(gh run list -w ${{ env.workflow_id }} --repo ${{ env.REPO }} -L 1 --json databaseId | jq -r '.[] | .databaseId')
-        echo "workflow_run_id=$WORKFLOW_RUN_ID" >> $GITHUB_ENV
-   
-    - name: Debug Workflow Run ID
-      run: |
-        echo "Workflow Run ID: ${{ env.workflow_run_id }}"
-
+  download_and_display:
+    needs: 
+      - Grab_Workflow_Run_ID
+    runs-on: ubuntu-latest
+    steps:
     - name: Download Artifact
       uses: actions/download-artifact@v4
       with:
         name: ${{ github.event.inputs.artifact_name }}
         repository: ${{ env.REPO }}
-        run-id: ${{ env.workflow_run_id }}
+        run-id: ${{ needs.Grab_Workflow_Run_ID.outputs.workflow_run_id}}
 
     - name: Display Artifact Contents
       run: ls -R .
