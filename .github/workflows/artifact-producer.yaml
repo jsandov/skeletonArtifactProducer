@@ -20,7 +20,7 @@ jobs:
         echo "Hello, World!" > artifact/hello.txt
 
     - name: Archive Artifact (Replace 'dist' with your build output directory)
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: myartifact
         path: artifact
