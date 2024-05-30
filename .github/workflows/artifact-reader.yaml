@@ -22,35 +22,27 @@ jobs:
   download_and_display:
     runs-on: ubuntu-latest
     steps:
-
-    - name: Grab Worklflow_id
+    - name: Grab Workflow ID
       id: get_workflow_id
       run: |
-        WORKFLOW_ID=$(gh workflow list --repo "jsandov/skeletonArtifactProducer" --json id,name | jq -r '.[] | select(.name == "Build and Archive Artifact") | .id')
+        WORKFLOW_ID=$(gh workflow list --repo "${{ env.REPO }}" --json id,name | jq -r '.[] | select(.name == "Build and Archive Artifact") | .id')
         echo "workflow_id=$WORKFLOW_ID" >> $GITHUB_OUTPUT
-
 
     - name: Get Workflow Run ID
       id: get_workflow_run_id
       run: |
-        WORKFLOW_RUN_ID=$(gh run list -w ${{steps.outputs.get_workflow_id.workflow_id}} --repo jsandov/skeletonArtifactProducer -L 1 --json databaseId | jq '.[] | .databaseId')
-        echo "The workflow id is: ${WORKFLOW_RUN_ID}"
+        WORKFLOW_RUN_ID=$(gh run list -w ${{ steps.get_workflow_id.outputs.workflow_id }} --repo ${{ env.REPO }} -L 1 --json databaseId | jq -r '.[] | .databaseId')
         echo "workflow_run_id=$WORKFLOW_RUN_ID" >> $GITHUB_OUTPUT
 
     - name: Download Artifact
       uses: actions/download-artifact@v4
       with:
         name: ${{ github.event.inputs.artifact_name }}
-        github-token: ${{ secrets.GH_PAT }} # Replace with your secret
         repository: ${{ github.event.inputs.source_repository }}
-        run-id: ${{ steps.get_workflow_run_id.outputs.WORKFLOW_RUN_ID}}
-
-
+        run-id: ${{ steps.get_workflow_run_id.outputs.workflow_run_id }}
 
     - name: Display Artifact Contents
       run: ls -R .
 
     - name: Display specific file in artifact
-      run: cat hello.txt
-
-
+      run: cat artifact/hello.txt
